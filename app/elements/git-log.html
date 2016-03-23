@@ -1,0 +1,54 @@
+<dom-module id='git-log'>
+	<style>
+
+		.dropdown-content {
+			background-color: #fafafa;
+		}
+
+	</style>
+
+	<template>
+		<iron-ajax
+			auto
+			url="/scripts/gitlog.js"
+			handle-as="json"
+			on-response="handle"
+		></iron-ajax>
+
+		<template is='dom-repeat' items='{{data}}' as='repo'>
+		<paper-menu-button>
+			<paper-button class="dropdown-trigger">{{repo.name}}</paper-button>
+			<div class="dropdown-content">
+				<template is='dom-repeat' items='{{repo.value}}'>
+				<div>
+					<span class="sha">{{item.sha}}</span>,
+					<span class="author">{{item.author}}</span>,
+					<span class="author_relative">{{item.author_relative}}</span>,
+					<span class="subject">{{item.subject}}</span>
+				</div>
+				</template>
+			</div>
+		</paper-menu-button>
+		</template>
+
+	</template>
+
+	<script>
+	(function () {
+		Polymer({
+			is: 'git-log',
+
+			handle: function (e) {
+				this.data = Object.keys(e.detail.response).map(function(key) {
+					return {
+						name: key,
+						value: e.detail.response[key]
+					}
+				})
+				console.log(e.detail.response, this.data)
+			}
+
+		})
+	})()
+	</script>
+</dom-module>

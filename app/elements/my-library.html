@@ -1,0 +1,56 @@
+<dom-module id="my-library">
+	<style>
+	</style>
+
+	<template>
+	<!-- <template is="dom-if" if="{{isOwning(content.children.length)}}"> -->
+		<paper-item on-click="open">
+			<paper-icon-button icon="open"></paper-icon-button>
+			<span>Open library</span>
+		</paper-item>
+	<!-- </template> -->
+	<paper-dialog id="library">
+	Y'arr furniture stash
+	<!-- <paper-slider id="slider" min="10" max="100" value="50" on-change="onchange"></paper-slider> -->
+	<paper-dialog-scrollable>
+		<div id='content' class="layout wrap"></div>
+	</paper-dialog-scrollable>
+	</paper-dialog>
+	</template>
+
+	<script>
+	(function() {
+		'use strict';
+
+		Polymer({
+			is: 'my-library',
+
+			open : function () {
+				library.toggle()
+			},
+
+			insert : function (elem) {
+				content.appendChild(elem)
+			},
+
+			isOwning : function () {
+				return false
+			},
+
+			onchange : function () {
+				for (var i = 0; i < this.$.content.children.length; i++) {
+					this.$.content.children[i].setAttribute("style", "transform : scale(" + this.$.slider.value / 100 + ", " + this.$.slider.value / 100 + ")")
+				};
+			},
+
+			attached : function () {
+				// this.isOwning = function (test) {
+				// 	if (content.children.length == 0)
+				// 		return false
+				// 	else
+				// 		return true
+				// }
+			}
+		});
+	})();
+	</script>
