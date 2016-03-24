@@ -7,7 +7,15 @@ function do_file(res, files, index) {
 
 	FS.stat(file, function (err, stat) {
 
-	if (stat.isDirectory()) {
+	var git, head
+	try {
+		git = FS.statSync(file + '/.git')
+		head = FS.statSync(file + '/HEAD')
+	}
+	catch (e) {
+	}
+
+	if (stat.isDirectory() && (git || head)) {
 		try {
 			var stdout = ChildProcess.execSync('cd ' + file + ' && git log --all --pretty=format:"{' +
 				'\\"sha\\": \\"%h\\", ' +
@@ -41,5 +49,6 @@ function do_file(res, files, index) {
 
 FS.readdir('.', function (err, files) {
 	var res = {}
+	files.push('.')
 	do_file(res, files, 0)
 })
