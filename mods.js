@@ -21,7 +21,11 @@ var serve = function (req, res)
 			if (!err) {
 				res.end(data)
 			}
+			else
+				error(req, res)
 		})
+		else
+			error(req, res)
 	})
 }
 
@@ -70,14 +74,18 @@ var querysolve = function (url) {
 }
 
 var auth = function (req, res) {
-	// console.log('auth')
-	var user = {};
+	var auth = {login: 'test', password: 'test'}
+	var b64auth = (req.headers.authorization || '').split(' ')[1] || ''
+	var s = new Buffer(b64auth, 'base64').toString().split(':')
 
-	if (user === undefined || user['name'] !== 'ade' || user['pass'] !== 'ade') {
+	if (!s[0] || !s[1] || s[0] !== auth.login || s[1] !== auth.password) {
 		res.statusCode = 401;
 		res.setHeader('WWW-Authenticate', 'Basic');
 		res.end('Unauthorized');
+		return false
 	}
+	else
+		return true
 }
 
 exports.error = error
