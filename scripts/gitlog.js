@@ -7,42 +7,40 @@ function do_file(res, files, index) {
 
 	FS.stat(file, function (err, stat) {
 
-	var git, head
-	try {
-		git = FS.statSync(file + '/.git')
-		head = FS.statSync(file + '/HEAD')
-	}
-	catch (e) {
-	}
-
-	if (stat.isDirectory() && (git || head)) {
+		var git, head
 		try {
-			var stdout = ChildProcess.execSync('cd ' + file + ' && git log --all --pretty=format:"{' +
-				'\\"sha\\": \\"%h\\", ' +
-				'\\"author\\": \\"%an\\", ' +
-				'\\"author_relative\\": \\"%ar\\", ' +
-				'\\"subject\\": \\"%s\\"' +
-				'}, "')
-
-			if (stat.isDirectory() && stdout != '')
-				res[file] = JSON.parse( '[' + stdout.slice(0, stdout.length - 2) + ']' )
-
-		} catch (e) {
-
-			console.warn('catch gitlog', file)
-
+			git = FS.statSync(file + '/.git')
+			head = FS.statSync(file + '/HEAD')
 		}
-	}
+		catch (e) {
+		}
 
-	if (files[index + 1])
-		do_file(res, files, index + 1)
-	else {
+		if (stat.isDirectory() && (git || head)) {
+			try {
+				var stdout = ChildProcess.execSync('cd ' + file + ' && git log --all --pretty=format:"{' +
+					'\\"sha\\": \\"%h\\", ' +
+					'\\"author\\": \\"%an\\", ' +
+					'\\"author_relative\\": \\"%ar\\", ' +
+					'\\"subject\\": \\"%s\\"' +
+					'}, "')
 
-		// console.warn(JSON.stringify(res))
-		console.log( JSON.stringify(res) )
-	}
+				if (stat.isDirectory() && stdout != '')
+					res[file] = JSON.parse( '[' + stdout.slice(0, stdout.length - 2) + ']' )
 
+			} catch (e) {
 
+				console.warn('catch gitlog', file)
+
+			}
+		}
+
+		if (files[index + 1])
+			do_file(res, files, index + 1)
+		else {
+
+			// console.warn(JSON.stringify(res))
+			console.log( JSON.stringify(res) )
+		}
 
 	})
 }
