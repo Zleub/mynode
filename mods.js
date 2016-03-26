@@ -5,6 +5,18 @@ var ChildProcess = require('child_process')
 var QueryString = require('querystring')
 var Path = require('path')
 
+var isTrue = function (req, res)
+{
+	console.log('isTrue')
+	return true
+}
+
+var isFalse = function (req, res)
+{
+	console.log('isFalse')
+	return false
+}
+
 var error = function (req, res)
 {
 	res.statusCode = 404
@@ -88,6 +100,8 @@ var auth = function (req, res) {
 		return true
 }
 
+exports.isFalse = isFalse
+exports.isTrue = isTrue
 exports.error = error
 exports.serve = serve
 exports.exec = exec
