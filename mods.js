@@ -5,18 +5,6 @@ var ChildProcess = require('child_process')
 var QueryString = require('querystring')
 var Path = require('path')
 
-var isTrue = function (req, res)
-{
-	console.log('isTrue')
-	return true
-}
-
-var isFalse = function (req, res)
-{
-	console.log('isFalse')
-	return false
-}
-
 var error = function (req, res)
 {
 	res.statusCode = 404

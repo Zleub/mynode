@@ -23,6 +23,16 @@ var host = function (req, res, key, value) {
 	}
 }
 
+var url = function (req, res, key, value) {
+	if (!req.url)
+		return false
+
+	if ( req.url.match(key) ) {
+		return value(req,res)
+	}
+
+}
+
 var solve = function (req, res, key, value) {
 	return value(req, res)
 }
@@ -32,3 +42,4 @@ exports.Or = Or
 
 exports.solve = solve
 exports.host = host
+exports.url = url
