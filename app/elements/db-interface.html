@@ -1,0 +1,123 @@
+<dom-module id="db-interface">
+
+<style>
+	.item {
+		border: groove;
+	}
+	.button {
+		top: 24px;
+	}
+	.icon {
+		padding: 10px;
+	}
+/*	:host {
+		--paper-item-disabled-color: --text-color;
+	}
+*/</style>
+
+<template>
+	<h1>{{url}}</h1>
+	<iron-ajax id="get"
+		auto
+		url="{{url}}"
+		handle-as="json"
+		on-response="handle"
+	></iron-ajax>
+
+	<iron-ajax id="post"
+		url="../../scripts/store.js"
+		method="POST"
+		body='{{body}}'
+		handle-as="json"
+	></iron-ajax>
+
+	<div class="layout horizontal">
+	<template is="dom-repeat" items="{{keys}}" as="key">
+		<div class="layout vertical">
+		<paper-item class="head" >{{key}}</paper-item>
+		<template is="dom-repeat" items="{{data}}" as="data">
+			<paper-item class="item" key="{{key}}" index="{{index}}" contenteditable on-input="test">
+				{{get(data, key)}}
+			</paper-item>
+		</template>
+		</div>
+	</template>
+	<paper-item>
+		<iron-icon icon="add"></iron-icon>
+	</paper-item>
+	</div>
+	<paper-item>
+		<iron-icon icon="add"></iron-icon>
+	</paper-item>
+
+	<div class="layout horizontal">
+		<paper-item on-click="db_post">
+			<iron-icon class="icon" icon="cloud-upload"></iron-icon>Upload
+		</paper-item>
+		<paper-item on-click="db_get">
+			<iron-icon class="icon" icon="cloud-download"></iron-icon>Sync
+		</paper-item>
+	</div>
+</template>
+
+<script>
+(function () {
+	Polymer({
+		is: 'db-interface',
+
+		properties: {
+			"url": {
+				type: String,
+				reflectToAttribute: true
+			},
+			"data": {
+				type: Array,
+				notify: true
+			},
+			"keys": {
+				type: Array,
+				notify: true
+			}
+		},
+
+		observers: [
+			'makeParam(url, keys, data.*)'
+		],
+
+		db_post: function () {
+			this.$.post.generateRequest()
+		},
+		db_get: function () {
+			this.$.get.generateRequest()
+		},
+
+		test: function (e) {
+			var index = e.srcElement.index
+			var key = e.srcElement.key
+
+			this.set('data.' + index + '.' + key, e.target.innerText)
+		},
+
+		get: function (data, key) {
+			return data[key]
+		},
+
+		makeParam: function (url, keys, data) {
+			this.set('body', JSON.stringify({
+				"url": url,
+				"db": {
+					description: keys,
+					value: data.base
+				}
+			}))
+		},
+
+		handle: function (e) {
+			this.set('data', e.detail.response.value)
+			this.set('keys', e.detail.response.description)
+		}
+	})
+})()
+</script>
+
+</dom-module>
