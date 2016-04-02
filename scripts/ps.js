@@ -1,6 +1,6 @@
 var ChildProcess = require('child_process')
 
-ChildProcess.exec('ps --no-header -o "%p %U %c %y"', function (err, stdout, stderr) {
+ChildProcess.exec('ps --no-header -Ao "%p %U %c %y"', function (err, stdout, stderr) {
 	var array = []
 
 	stdout.toString().match(/(\S+)\s*(\S+)\s*(\S+)\s*(\S+)\s*/g).forEach( function (elem) {

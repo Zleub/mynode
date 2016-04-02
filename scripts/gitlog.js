@@ -9,10 +9,11 @@ function do_file(res, files, index) {
 
 		var git, head
 		try {
-			git = FS.statSync(file + '/.git')
 			head = FS.statSync(file + '/HEAD')
+			git = FS.statSync(file + '/.git')
 		}
 		catch (e) {
+			// console.warn('gitlog catch', e)
 		}
 
 		if (stat.isDirectory() && (git || head)) {
@@ -24,12 +25,15 @@ function do_file(res, files, index) {
 					'\\"subject\\": \\"%s\\"' +
 					'}, "')
 
-				if (stat.isDirectory() && stdout != '')
+				if (stat.isDirectory() && stdout != '') {
+					if (file == ".git")
+						file = "."
 					res[file] = JSON.parse( '[' + stdout.slice(0, stdout.length - 2) + ']' )
+				}
 
 			} catch (e) {
 
-				console.warn('catch gitlog', file)
+				// console.warn('catch gitlog', file)
 
 			}
 		}
