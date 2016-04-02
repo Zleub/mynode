@@ -17,7 +17,7 @@
 
 		<template is='dom-repeat' items='{{data}}' as='repo'>
 		<paper-menu-button>
-			<paper-button class="dropdown-trigger">{{repo.name}}</paper-button>
+			<paper-button raised class="dropdown-trigger">{{repo.name}}</paper-button>
 			<div class="dropdown-content">
 				<template is='dom-repeat' items='{{repo.value}}'>
 				<div>
@@ -45,7 +45,6 @@
 						value: e.detail.response[key]
 					}
 				})
-				console.log(e.detail.response, this.data)
 			}
 
 		})

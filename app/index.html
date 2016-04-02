@@ -58,10 +58,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	<!-- For shared styles, shared-styles.html import in elements.html -->
 	<style is="custom-style" include="shared-styles"></style>
-	<style>
-	.sha {
-		color: red;
-	}
+	<style is="custom-style">
+		.sha {
+			color: red;
+		}
+
+		:root {
+			--paper-tabs-selection-bar-color: blue;
+		}
 	</style>
 </head>
 
@@ -73,30 +77,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<!-- Main Content -->
 	<div class="content">
 
-		<iron-pages attr-for-selected="data-route" selected="{{route}}">
+		<paper-tabs class="tabs" selected="{{route}}" attr-for-selected='name' noink>
+			<paper-tab name='home'>home page</paper-tab>
+			<paper-tab name='gitlog'>gitlog page</paper-tab>
+		</paper-tabs>
 
+		<iron-pages attr-for-selected="data-route" selected="{{route}}">
 		<section data-route="home">
 
-<!-- 		<iron-ajax
-			auto
-			url="http://adebray.ovh/scripts/ps.js"
-			handle-as="json"
-			on-response="handlePS"
-		></iron-ajax> -->
+		<db-interface url="db/json/test.json"></db-interface>
 
-		<template is='dom-repeat' items='{{ps}}'>
-		<p>
-			<span>{{item.pid}}</span><br>
-			{{item.uname}} -> {{item.command}} : {{item.tty}}
-		</p>
-		</template>
-
-		<git-log></git-log>
-
-		<prism-demo code='function test() { print("hello") }'></prism-demo>
+		<!-- <prism-demo code='function test() { print("hello") }'></prism-demo> -->
 
 		</section>
 
+		<section data-route="gitlog">
+			<git-log></git-log>
+		</section>
 
 		</iron-pages>
 	</div>

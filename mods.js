@@ -7,31 +7,36 @@ var Path = require('path')
 
 var error = function (req, res)
 {
+	// console.log('error')
+
 	res.statusCode = 404
 	res.end('My own 404')
+
+	return true
 }
 
 var serve = function (req, res)
 {
 	// console.log('serve', req.url)
 
-	FS.access('.' + req.url, FS.R_OK, function (err) {
-		if (!err)
-			FS.readFile('.' + req.url, 'ascii', function (err, data) {
-			if (!err) {
-				res.end(data)
-			}
-			else
-				error(req, res)
-		})
-		else
-			error(req, res)
-	})
+	try {
+		FS.accessSync('.' + req.url, FS.R_OK)
+		var data = FS.readFileSync('.' + req.url)
+
+		// console.log('end')
+		res.end(data)
+	}
+	catch (e) {
+		console.log('serve error: ', e)
+		return false
+	}
+
+	return true
 }
 
 var exec = function (req, res)
 {
-	// console.log('exec', req.url)
+	// console.log('exec', req.body)
 
 	var q = querysolve(req.url)
 
@@ -42,12 +47,15 @@ var exec = function (req, res)
 		})
 	}
 
-	// console.log(req.url)
+	req.body = req.body.replace(/([" ])/g, '\\\$1')
+	// req.body = escape(req.body)
+	// console.log(req.url, req.body)
 
 	try {
-		res.end( ChildProcess.execSync('node .' + req.url) )
+		res.end( ChildProcess.execSync('node .' + req.url + ' ' + req.body || '') )
 	} catch(e) {
-		// console.log('catch mod', e);
+		console.log('catch mod');
+		return false
 	}
 
 	return true
@@ -70,11 +78,13 @@ var querysolve = function (url) {
 		})
 	}
 
-	return queryObj
+	return  QueryString.parse(URLObj.query)
 }
 
 var auth = function (req, res) {
-	var auth = {login: 'test', password: 'test'}
+	// console.log('auth')
+
+	var auth = {login: 'adebray', password: 'adebray'}
 	var b64auth = (req.headers.authorization || '').split(' ')[1] || ''
 	var s = new Buffer(b64auth, 'base64').toString().split(':')
 
@@ -88,8 +98,6 @@ var auth = function (req, res) {
 		return true
 }
 
-exports.isFalse = isFalse
-exports.isTrue = isTrue
 exports.error = error
 exports.serve = serve
 exports.exec = exec

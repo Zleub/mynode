@@ -8,9 +8,11 @@ Mods = require('./mods.js')
 
 var url = {
 	'^/$' : Solver.And([
-		function (req, res) { req.url = '/app/index.html' },
-		Mods.serve,
-		Mods.error
+		function (req, res) { req.url = '/app/index.html'; return true },
+		Solver.Or([
+			Mods.serve,
+			Mods.error
+			], Solver.solve),
 	], Solver.solve),
 	'^/scripts/.+' : Solver.And([
 		Mods.exec,
@@ -27,7 +29,7 @@ var host = {
 		Mods.auth,
 		Solver.Or(url, Solver.url),
 	], Solver.solve),
-	'.+' : Solver.Or(url, Solver.url),
+	'.+' : Mods.error,
 }
 
 // exports.filesystem = filesystem
