@@ -1,0 +1,50 @@
+<dom-module id="chart-polar">
+	<style>
+		:host {
+			display: block;
+		}
+	</style>
+
+	<template>
+		<canvas id="myChart" width="{{width}}" height="{{height}}"></canvas>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'chart-polar',
+
+			behaviors: [ChartBehaviors],
+
+			render: function (state, data, option) {
+				if (state != true)
+					return
+
+				var harmonizer = new Harmonizer()
+
+				var min = Number.MAX_VALUE
+				var max = Number.MIN_VALUE
+				data.forEach( (e, i) => {
+					var color = this.getRandomColor()
+
+					e.color = harmonizer.harmonize(color, 'complementary')[0]
+					e.highlight = harmonizer.harmonize(color, 'complementary')[1]
+
+					if (e.value > max) max = e.value
+					if (e.value < min) min = e.value
+				})
+
+				var ctx = this.querySelector("#myChart").getContext("2d")
+				Chart.defaults.global.scaleOverride = true
+
+				Chart.defaults.global.scaleSteps = 4
+				Chart.defaults.global.scaleStepWidth = max / 4
+				Chart.defaults.global.scaleStartValue = 0
+				Chart.defaults.global.scaleShowLabels = false
+				var myNewChart = new Chart(ctx).PolarArea(this.data, this.option)
+
+			}
+
+		});
+	</script>
+
+</dom-module>

@@ -1,0 +1,43 @@
+	<script>
+		ChartBehaviors = {
+
+			properties: {
+				visible: {
+					type: Boolean,
+					value: false
+				},
+				width: {
+					type: Number,
+					value: 400
+				},
+				height: {
+					type: Number,
+					value: 400
+				},
+
+				data: Object,
+				option: {
+					type: Object,
+					value: {}
+				}
+			},
+
+			observers: [
+				'render(visible, data, option)'
+			],
+
+			getRandomColor: function () {
+				var letters = '0123456789ABCDEF'.split('')
+				var color = '#'
+				for (var i = 0; i < 6; i++ ) {
+					color += letters[Math.floor(Math.random() * 16)]
+				}
+				return color
+			}
+
+		}
+
+		// Polymer({
+		// 	is: 'aluminium-behaviors'
+		// });
+	</script>

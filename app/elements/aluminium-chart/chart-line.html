@@ -1,0 +1,58 @@
+<dom-module id="chart-line">
+	<style>
+		:host {
+			display: block;
+		}
+	</style>
+
+	<template>
+		<canvas id="myChart" width="{{width}}" height="{{height}}"></canvas>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'chart-line',
+
+			behaviors: [ChartBehaviors],
+
+			render: function (state, data, option) {
+
+				if (state != true)
+					return
+
+				var harmonizer = new Harmonizer()
+
+				var min = Number.MAX_VALUE
+				var max = Number.MIN_VALUE
+
+				data.datasets.forEach( (e, i) => {
+					var color = this.getRandomColor()
+
+					e.fillColor = harmonizer.harmonize(color, 'complementary')[0]
+					e.strokeColor = harmonizer.harmonize(color, 'complementary')[1]
+					e.pointColor = "rgba(220,220,220,1)"
+					e.pointStrokeColor = "#fff"
+					e.pointHighlightFill = "#fff"
+					e.pointHighlightStroke = "rgba(220,220,220,1)"
+
+					e.data.forEach (v => {
+						if (v > max) max = v
+						if (v < min) min = v
+					})
+
+				})
+
+				var ctx = this.querySelector("#myChart").getContext("2d")
+				Chart.defaults.global.scaleOverride = true
+
+				Chart.defaults.global.scaleSteps = 4
+				Chart.defaults.global.scaleStepWidth = max / 4
+				Chart.defaults.global.scaleStartValue = 0
+				Chart.defaults.global.scaleShowLabels = true
+
+				var myNewChart = new Chart(ctx).Line(data, option)
+			}
+		});
+	</script>
+
+</dom-module>
