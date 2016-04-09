@@ -48,7 +48,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	<!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
 	<script src="app/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-	<script src="app/libs/three.min.js"></script>
+	<!-- <script src="app/libs/three.min.js"></script> -->
+	<script src="app/libs/one-color-all.js"></script>
+	<script src="app/libs/color-harmony.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+	<!-- <script src="app/libs/three.min.js"></script> -->
 
 	<!-- endbuild -->
 
@@ -80,20 +84,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		<paper-tabs class="tabs" selected="{{route}}" attr-for-selected='name' noink>
 			<paper-tab name='home'>home page</paper-tab>
 			<paper-tab name='gitlog'>gitlog page</paper-tab>
-		</paper-tabs>
+			<paper-tab name='pslog'>pslog page</paper-tab>
+			<paper-tab name='deadland'>deadland page</paper-tab>
+
+ 		</paper-tabs>
 
 		<iron-pages attr-for-selected="data-route" selected="{{route}}">
-		<section data-route="home">
 
-		<db-interface url="db/json/test.json"></db-interface>
+			<index-section data-route="home">
+				<div class="layout horizontal around-justified">
+					<db-interface url="db/json/test.json"></db-interface>
+					<db-interface url="db/json/data.json"></db-interface>
+				</div>
+			</index-section>
 
-		<!-- <prism-demo code='function test() { print("hello") }'></prism-demo> -->
+			<index-section data-route="gitlog">
+				<git-log></git-log>
+			</index-section>
 
-		</section>
+			<index-section data-route="pslog">
+				<ps-log></ps-log>
+			</index-section>
 
-		<section data-route="gitlog">
-			<git-log></git-log>
-		</section>
+			<index-section data-route="deadland">
+				<character-page></character-page>
+			</index-section>
 
 		</iron-pages>
 	</div>
