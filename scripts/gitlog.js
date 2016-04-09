@@ -3,16 +3,20 @@ var ChildProcess = require('child_process')
 // var Buffer = require('buffer')
 
 function do_file(res, files, index) {
-	var file = files[index]
+	var file = './git/' + files[index]
 
 	FS.stat(file, function (err, stat) {
 
 		var git, head
 		try {
 			head = FS.statSync(file + '/HEAD')
-			git = FS.statSync(file + '/.git')
 		}
 		catch (e) {
+			try {
+				git = FS.statSync(file + '/.git')
+			}
+			catch (e) {
+			}
 			// console.warn('gitlog catch', e)
 		}
 
@@ -49,8 +53,7 @@ function do_file(res, files, index) {
 	})
 }
 
-FS.readdir('.', function (err, files) {
+FS.readdir('./git', function (err, files) {
 	var res = {}
-	files.push('.')
 	do_file(res, files, 0)
 })
