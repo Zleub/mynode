@@ -1,0 +1,28 @@
+<dom-module id="character-field">
+	<style>
+
+	.key {
+		margin-right: 24px;
+	}
+	</style>
+
+	<template>
+
+	<paper-item>
+		<span class="key">{{key}}:</span>
+		<span class="value">{{value}}</span>
+	</paper-item>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'character-field',
+
+			properties: {
+				key: String,
+				value: String
+			}
+		});
+	</script>
+</dom-module>

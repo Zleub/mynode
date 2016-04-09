@@ -15,21 +15,29 @@
 			on-response="handle"
 		></iron-ajax>
 
-		<template is='dom-repeat' items='{{data}}' as='repo'>
-		<paper-menu-button>
-			<paper-button raised class="dropdown-trigger">{{repo.name}}</paper-button>
-			<div class="dropdown-content">
-				<template is='dom-repeat' items='{{repo.value}}'>
-				<div>
-					<span class="sha">{{item.sha}}</span>,
-					<span class="author">{{item.author}}</span>,
-					<span class="author_relative">{{item.author_relative}}</span>,
-					<span class="subject">{{item.subject}}</span>
+		<div class="layout horizontal">
+
+		<chart-polar id='chart' width="400" height="400" data="{{chart}}"></chart-polar>
+
+		<div>
+			<template is='dom-repeat' items='{{data}}' as='repo'>
+			<paper-menu-button>
+				<paper-button raised class="dropdown-trigger">{{repo.name}}</paper-button>
+				<div class="dropdown-content">
+					<template is='dom-repeat' items='{{repo.value}}'>
+					<div>
+						<span class="sha">{{item.sha}}</span>,
+						<span class="author">{{item.author}}</span>,
+						<span class="author_relative">{{item.author_relative}}</span>,
+						<span class="subject">{{item.subject}}</span>
+					</div>
+					</template>
 				</div>
-				</template>
-			</div>
-		</paper-menu-button>
-		</template>
+			</paper-menu-button>
+			</template>
+		</div>
+
+		</div>
 
 	</template>
 
@@ -38,13 +46,34 @@
 		Polymer({
 			is: 'git-log',
 
+			properties: {
+				visible: {
+					type: Boolean,
+					observer: 'transmit'
+				},
+				data: Array,
+				chart: Array
+			},
+
+			transmit: function (value) {
+				this.$.chart.set('visible', value)
+			},
+
 			handle: function (e) {
-				this.data = Object.keys(e.detail.response).map(function(key) {
+				this.set('data', Object.keys(e.detail.response).map(function(key) {
 					return {
 						name: key,
 						value: e.detail.response[key]
 					}
-				})
+				}))
+				this.set('chart', Object.keys(e.detail.response).map(function(key) {
+					return {
+						label: key,
+						value: e.detail.response[key].length
+					}
+				}))
+
+				// console.log(this.chart)
 			}
 
 		})

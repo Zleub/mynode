@@ -1,0 +1,60 @@
+<dom-module id="ps-log">
+	<style>
+		:host {
+			display: block;
+		}
+	</style>
+
+
+	<template>
+	<iron-ajax id="ajax" auto url="/scripts/ps.js" handle-as="json" on-response="handle"></iron-ajax>
+
+	<chart-line width="800" height="400" data="{{data}}"></chart-line>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'ps-log',
+
+			properties: {
+				visible: {
+					type: Boolean,
+					observer: 'transmit'
+				},
+				data: Object
+			},
+
+			toString: function (data) {
+				return JSON.stringify(data)
+			},
+
+			transmit: function (value) {
+				for (var i = 0; i < this.children.length; i++) {
+					this.children[i].set('visible', value)
+				}
+			},
+
+			handle: function (e) {
+				var data = {
+					labels: [],
+					datasets: []
+				}
+
+				e.detail.response.forEach( elem => {
+					if ( data.labels.find( v => v == elem.uname ) == undefined ) {
+						data.labels.push(elem.uname)
+						this[elem.uname] = 1
+					} else {
+						this[elem.uname] += 1
+					}
+				})
+
+				data.datasets.push({
+					data: data.labels.map( e => this[e] )
+				})
+
+				this.set('data', data)
+			}
+		});
+	</script>
+</dom-module>

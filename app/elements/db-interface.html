@@ -10,13 +10,16 @@
 	.icon {
 		padding: 10px;
 	}
+	.padded {
+		display: inline-block;
+	}
 /*	:host {
 		--paper-item-disabled-color: --text-color;
 	}
 */</style>
 
 <template>
-	<h1>{{url}}</h1>
+	<p>{{url}}</p>
 	<iron-ajax id="get"
 		auto
 		url="{{url}}"
@@ -31,33 +34,50 @@
 		handle-as="json"
 	></iron-ajax>
 
-	<div class="layout horizontal">
-	<template is="dom-repeat" items="{{keys}}" as="key">
-		<div class="layout vertical">
-		<paper-item class="head" >{{key}}</paper-item>
-		<template is="dom-repeat" items="{{data}}" as="data">
-			<paper-item class="item" key="{{key}}" index="{{index}}" contenteditable on-input="test">
-				{{get(data, key)}}
-			</paper-item>
+
+	<div class="layout padded">
+
+		<div class="layout horizontal">
+
+		<template is="dom-repeat" items="{{keys}}" as="key" indexAs="ind">
+			<div class="layout vertical">
+				<paper-item class="head" >
+					{{key}}
+					<paper-icon-button index="{{ind}}" key="{{key}}" icon="delete" on-tap="deleteCol"></paper-icon-button>
+				</paper-item>
+				<template is="dom-repeat" items="{{data}}" as="data">
+					<paper-item class="item" key="{{key}}" index="{{index}}" contenteditable on-input="edit">
+					{{get(data, key)}}
+					</paper-item>
+				</template>
+			</div>
 		</template>
+
+		<paper-item id="col_button">
+			<iron-icon icon="add"></iron-icon>
+		</paper-item>
+
 		</div>
-	</template>
-	<paper-item>
+
+	<paper-item id="row_button">
 		<iron-icon icon="add"></iron-icon>
 	</paper-item>
 	</div>
-	<paper-item>
-		<iron-icon icon="add"></iron-icon>
-	</paper-item>
 
 	<div class="layout horizontal">
-		<paper-item on-click="db_post">
+		<paper-item id="db_post">
 			<iron-icon class="icon" icon="cloud-upload"></iron-icon>Upload
 		</paper-item>
-		<paper-item on-click="db_get">
+		<paper-item id="db_get">
 			<iron-icon class="icon" icon="cloud-download"></iron-icon>Sync
 		</paper-item>
 	</div>
+
+	<paper-dialog id="field">
+		<h2>Field Name</h2>
+		<paper-input id="field_input"></paper-input>
+	</paper-dialog>
+
 </template>
 
 <script>
@@ -84,14 +104,65 @@
 			'makeParam(url, keys, data.*)'
 		],
 
-		db_post: function () {
+		listeners: {
+			"db_post.tap": 'DBpost',
+			"db_get.tap": 'DBget',
+			"col_button.tap": 'addCol',
+			"row_button.tap": 'addRow',
+			"field.iron-overlay-closed": 'pushCol',
+			"field.iron-overlay-opened": 'focusInput',
+		},
+
+		focusInput: function () {
+			this.$.field_input.value = ''
+			this.$.field_input.$.input.focus()
+		},
+
+		DBpost: function () {
 			this.$.post.generateRequest()
 		},
-		db_get: function () {
+		DBget: function () {
 			this.$.get.generateRequest()
 		},
 
-		test: function (e) {
+		deleteCol: function (e) {
+			var index = e.model.index
+			var val = e.model.key
+
+			this.arrayDelete('keys', this.keys[index])
+			this.set('keys', this.keys)
+
+			this.set('data', this.data.map( function (e) {
+				delete e[val]
+				return e
+			}))
+
+		},
+
+		pushCol: function () {
+			var val = this.$.field_input.value
+			this.push('keys', val)
+
+			this.data.forEach( function (e) {
+				e[val] = ""
+			})
+
+			this.notifyPath('data.*', this.data)
+		},
+		addCol: function () {
+			this.$.field.toggle()
+		},
+		addRow: function () {
+			var o = {}
+
+			this.keys.forEach( function (k) {
+				o[k] = k
+			})
+
+			this.push('data', o)
+		},
+
+		edit: function (e) {
 			var index = e.srcElement.index
 			var key = e.srcElement.key
 

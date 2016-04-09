@@ -1,0 +1,178 @@
+<dom-module id="character-page">
+	<style>
+		:host {
+			display: block;
+		}
+	</style>
+
+	<template>
+		<iron-ajax
+			auto
+			url="/scripts/noe.js"
+			handle-as="json"
+			on-response="handle">
+		</iron-ajax>
+
+		<div class="layout horizontal around-justified">
+			<div>
+				<character-field key="Name" value="{{data.name}}"></character-field>
+				<character-field key="Age" value="{{data.age}}"></character-field>
+
+				<character-field key="XP" value="{{data.xp}}"></character-field>
+				<character-field key="Level" value="{{data.level}}"></character-field>
+				<character-field key="Rank" value="{{data.rank}}"></character-field>
+				<character-field key="Joker" value="{{data.joker}}"></character-field>
+
+			</div>
+			<div>
+				<template is="dom-repeat" items="{{primaryKeys}}">
+					<character-field key="{{getPath(data, item, 'name')}}" value="{{getPath(data, item, 'level')}}"></character-field>
+				</template>
+			</div>
+
+			<div>
+				<template is="dom-repeat" items="{{secondaryKeys}}">
+					<character-field key="{{item}}" value="{{getPath(data, item)}}"></character-field>
+				</template>
+			</div>
+		</div>
+
+		<div class="layout horizontal around-justified">
+			<template is="dom-repeat" items="{{primaryKeys}}" as="key">
+
+				<template is="dom-if" if="{{ownSomething(data, key)}}">
+					<div class="flex">
+					<p>{{getPath(data, key, 'name')}}</p>
+					<template is="dom-repeat" items="{{getArray(data, key, 'skills')}}">
+					<paper-item>
+						<div class="flex">{{item.name}}</div> {{item.value}}
+					</paper-item>
+					</template>
+					</div>
+				</template>
+
+			</template>
+		</div>
+
+		<div class="layout horizontal">
+			<div class="flex">
+			<p>Armes ({{getWeight(data, 'equipement', 'armes')}})</p>
+			<template is="dom-repeat" items="{{data.equipement.armes}}">
+				<paper-item>
+					<div class="flex">{{item.name}}</div>{{item.poids}}
+				</paper-item>
+			</template>
+			</div>
+
+			<div class="flex">
+			<p>Objets ({{getWeight(data, 'equipement', 'objets')}})</p>
+			<template is="dom-repeat" items="{{data.equipement.objets}}">
+				<paper-item>
+					<div class="flex">{{item.name}}
+						<template is="dom-if" if="{{item.quantite}}">* {{item.quantite}}</template>
+					</div>{{item.poids}}
+				</paper-item>
+			</template>
+			</div>
+		</div>
+
+		<div class="layout horizontal around-justified">
+			<chart-line visible width="1200" height="400" data="{{getChart(data)}}"></chart-polar>
+		</div>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'character-page',
+
+			properties: {
+				data: Object,
+
+				primaryKeys: {
+					type: Array,
+					value: [
+						"agilite",
+						"ame",
+						"force",
+						"intellect",
+						"vigueur"
+					]
+				},
+
+				secondaryKeys: {
+					type: Array,
+					value: [
+						"allure",
+						"charisme",
+						"parade",
+						"resistance",
+						"trempe"
+					]
+				}
+
+			},
+
+			getChart: function (data) {
+				var array = this.getPath(data, 'equipement', 'armes').concat( this.getPath(data, 'equipement', 'objets') )
+
+				return {
+					labels: array.map( function (e) {
+						return e.name
+					}),
+					datasets: [{
+						data: array.map( function (e) {
+							return (function (elem) {
+								if (elem.quantite)
+									return elem.poids * elem.quantite
+								else
+									return elem.poids
+							})(e)
+						})
+					}]
+				}
+			},
+
+			getWeight: function (data) {
+				var array = this.getPath(data, arguments[1], arguments[2])
+
+				return array.reduce( function (prev, elem) {
+					if (elem.quantite)
+						return prev + elem.poids * elem.quantite
+					else
+						return prev + elem.poids
+				}, 0)
+			},
+
+			getArray: function (data) {
+				var obj = this.getPath(data, arguments[1], arguments[2])
+
+				return Object.keys(obj).map( function (e) {
+					return {
+						name: e,
+						value: obj[e]
+					}
+				})
+			},
+
+			getPath: function (data) {
+				var path = ''
+				for (var i = 1; i < arguments.length; i++) {
+					path += arguments[i]
+					if (arguments[i + 1])
+						path += '.'
+				}
+
+				return this.get(path, data)
+			},
+
+			ownSomething: function (data, key) {
+				return Object.keys(data[key].skills).length >= 1
+			},
+
+			handle: function (e) {
+				this.set('data', e.detail.response)
+			}
+		});
+	</script>
+</dom-module>
